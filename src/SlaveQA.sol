@@ -126,6 +126,15 @@ contract SlaveQA {
         slave.chats.push(Chat({who: msg.sender, content: content, price: 0}));
     }
 
+    function answerMaster(string memory content) public {
+        Slave storage slave = addressToSlave[msg.sender];
+        if (slave.self == address(0)) {
+            slave.self = msg.sender;
+        }
+
+        slave.chats.push(Chat({who: msg.sender, content: content, price: 0}));
+    }
+
     function getSlaves() public view returns (Slave[] memory) {
         uint256 len = addresses.length;
         Slave[] memory results = new Slave[](len);
