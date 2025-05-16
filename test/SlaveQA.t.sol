@@ -16,6 +16,7 @@ contract SlaveQATest is Test {
         slaveQA = new SlaveQA();
         deal(USER1, USER_BALANCE);
         deal(USER2, USER_BALANCE);
+        deal(USER3, USER_BALANCE);
     }
 
     function test_get() public {
@@ -70,5 +71,30 @@ contract SlaveQATest is Test {
         assertEq(chat.who, USER1);
         assertEq(chat.content, "a1");
         assertEq(chat.price, 0);
+    }
+
+    function test_sellSlave() public {
+        vm.prank(USER1);
+        slaveQA.sellSelf(114514, "aaa");
+        vm.prank(USER2);
+        slaveQA.buySlave{value: 114514}(USER1);
+        vm.prank(USER2);
+        slaveQA.sellSlave(USER1, 114514);
+        vm.prank(USER3);
+        slaveQA.buySlave{value: 114514}(USER1);
+
+        SlaveQA.Slave memory s1 = slaveQA.getOrDefault(USER1);
+        SlaveQA.Slave memory s2 = slaveQA.getOrDefault(USER2);
+        SlaveQA.Slave memory s3 = slaveQA.getOrDefault(USER3);
+        assertEq(s1.price, 0);
+        assertEq(s1.master, USER3);
+        assertEq(s1.slaves.length, 0);
+        assertEq(s2.price, 0);
+        assertEq(s2.master, address(0));
+        assertEq(s2.slaves.length, 0);
+        assertEq(s3.price, 0);
+        assertEq(s3.master, address(0));
+        assertEq(s3.slaves.length, 1);
+        assertEq(s3.slaves[0], USER1);
     }
 }

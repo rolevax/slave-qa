@@ -108,6 +108,20 @@ contract SlaveQA {
         );
     }
 
+    function sellSlave(address a, uint256 price) public payable {
+        Slave storage master = addressToSlave[msg.sender];
+        if (master.self == address(0)) {
+            revert SlaveNotExistError();
+        }
+
+        Slave storage slave = addressToSlave[a];
+        if (slave.self == address(0)) {
+            revert SlaveNotExistError();
+        }
+
+        slave.price = price;
+    }
+
     function askSlave(address a, string memory content) public {
         Slave storage master = addressToSlave[msg.sender];
         if (master.self == address(0)) {
