@@ -10,6 +10,11 @@ contract SlaveQA {
         address[] slaves;
     }
 
+    error SlaveNotExistError();
+    error SlaveStateError();
+    error PriceError();
+    error TransferError();
+
     mapping(address => Slave) addressToSlave;
     address[] addresses;
 
@@ -35,6 +40,59 @@ contract SlaveQA {
 
         slave.price = price;
         slave.desc = desc;
+    }
+
+    function buySlave(address a) public payable {
+        Slave memory test = addressToSlave[a];
+        if (test.self == address(0)) {
+            revert SlaveNotExistError();
+        }
+
+        Slave storage buyer = addressToSlave[msg.sender];
+        if (buyer.self == address(0)) {
+            buyer.self = msg.sender;
+            addresses.push(msg.sender);
+        }
+
+        Slave storage slave = addressToSlave[a];
+        if (slave.master == msg.sender) {
+            revert SlaveStateError();
+        }
+
+        if (msg.value == 0 || msg.value != slave.price) {
+            revert PriceError();
+        }
+
+        address prevMaster = slave.master;
+        if (prevMaster == address(0)) {
+            prevMaster = slave.self;
+        }
+
+        (bool sent, ) = payable(prevMaster).call{value: msg.value}("");
+        if (!sent) {
+            revert TransferError();
+        }
+
+        if (prevMaster != slave.self) {
+            address[] storage prevSlaves = addressToSlave[prevMaster].slaves;
+            uint256 len = prevSlaves.length;
+            for (uint256 i = 0; i < len; i++) {
+                if (prevSlaves[i] == a) {
+                    prevSlaves[i] = prevSlaves[len - 1];
+                    prevSlaves.pop();
+                    break;
+                }
+            }
+        }
+
+        if (buyer.self == slave.self) {
+            slave.master = address(0);
+        } else {
+            slave.master = msg.sender;
+            buyer.slaves.push(a);
+        }
+
+        slave.price = 0;
     }
 
     function getSlaves() public view returns (Slave[] memory) {

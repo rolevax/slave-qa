@@ -9,6 +9,7 @@ contract SlaveQATest is Test {
 
     address USER1 = makeAddr("alice");
     address USER2 = makeAddr("bob");
+    address USER3 = makeAddr("c");
     uint256 USER_BALANCE = 1 ether;
 
     function setUp() public {
@@ -36,5 +37,22 @@ contract SlaveQATest is Test {
         SlaveQA.Slave[] memory slaves = slaveQA.getSlaves();
         assertEq(slaves.length, 1);
         assertEq(slaves[0].self, USER1);
+    }
+
+    function test_buySlave() public {
+        vm.prank(USER1);
+        slaveQA.sellSelf(114514, "aaa");
+        vm.prank(USER2);
+        slaveQA.buySlave{value: 114514}(USER1);
+
+        SlaveQA.Slave memory s1 = slaveQA.getOrDefault(USER1);
+        SlaveQA.Slave memory s2 = slaveQA.getOrDefault(USER2);
+        assertEq(s1.price, 0);
+        assertEq(s1.master, USER2);
+        assertEq(s1.slaves.length, 0);
+        assertEq(s2.price, 0);
+        assertEq(s2.master, address(0));
+        assertEq(s2.slaves.length, 1);
+        assertEq(s2.slaves[0], USER1);
     }
 }
