@@ -2,17 +2,17 @@
 pragma solidity ^0.8.28;
 
 import {Script, console} from "forge-std/Script.sol";
-import {Counter} from "../src/Counter.sol";
+import {SlaveQA} from "../src/SlaveQA.sol";
 
-contract CounterScript is Script {
-    Counter public counter;
+contract SlaveQAScript is Script {
+    SlaveQA public counter;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        counter = new Counter();
+        counter = new SlaveQA();
 
         vm.stopBroadcast();
     }
