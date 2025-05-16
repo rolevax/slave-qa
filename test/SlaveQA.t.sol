@@ -54,5 +54,13 @@ contract SlaveQATest is Test {
         assertEq(s2.master, address(0));
         assertEq(s2.slaves.length, 1);
         assertEq(s2.slaves[0], USER1);
+
+        vm.prank(USER2);
+        slaveQA.askSlave(USER1, "q1");
+        s1 = slaveQA.getOrDefault(USER1);
+        SlaveQA.Chat memory chat = s1.chats[s1.chats.length - 1];
+        assertEq(chat.who, USER2);
+        assertEq(chat.content, "q1");
+        assertEq(chat.price, 0);
     }
 }

@@ -2,12 +2,19 @@
 pragma solidity ^0.8.28;
 
 contract SlaveQA {
+    struct Chat {
+        address who;
+        string content;
+        uint256 price;
+    }
+
     struct Slave {
         address self;
         string desc;
         uint256 price;
         address master;
         address[] slaves;
+        Chat[] chats;
     }
 
     error SlaveNotExistError();
@@ -40,6 +47,9 @@ contract SlaveQA {
 
         slave.price = price;
         slave.desc = desc;
+        slave.chats.push(
+            Chat({who: msg.sender, content: "sell", price: price})
+        );
     }
 
     function buySlave(address a) public payable {
@@ -93,6 +103,27 @@ contract SlaveQA {
         }
 
         slave.price = 0;
+        slave.chats.push(
+            Chat({who: msg.sender, content: "buy", price: msg.value})
+        );
+    }
+
+    function askSlave(address a, string memory content) public {
+        Slave storage master = addressToSlave[msg.sender];
+        if (master.self == address(0)) {
+            revert SlaveNotExistError();
+        }
+
+        Slave storage slave = addressToSlave[a];
+        if (slave.self == address(0)) {
+            revert SlaveNotExistError();
+        }
+
+        if (slave.master != msg.sender) {
+            revert SlaveStateError();
+        }
+
+        slave.chats.push(Chat({who: msg.sender, content: content, price: 0}));
     }
 
     function getSlaves() public view returns (Slave[] memory) {
