@@ -32,7 +32,7 @@ contract SlaveQA {
 
         Slave memory slave = addressToSlave[a];
         if (slave.self == address(0)) {
-            slave.self = msg.sender;
+            slave.self = a;
         }
 
         return slave;
