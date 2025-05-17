@@ -10,6 +10,8 @@ You can:
 - Ask questions to your slaves.
 - Answer quastions from your master.
 
+Frontend: https://github.com/rolevax/slave-qa-nextjs
+
 ## Usage
 
 ```shell
