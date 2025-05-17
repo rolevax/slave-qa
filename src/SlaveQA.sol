@@ -120,6 +120,9 @@ contract SlaveQA {
         }
 
         slave.price = price;
+        slave.chats.push(
+            Chat({who: msg.sender, content: "sell", price: price})
+        );
     }
 
     function askSlave(address a, string memory content) public {
