@@ -1,6 +1,6 @@
-## Slave Q&A
+## Slaveum
 
-**An on-chain social game of slaves, questions, and answers.**
+**An on-chain social game of slaves. **
 
 You can:
 
